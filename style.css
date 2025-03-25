@@ -22,14 +22,23 @@ h1 {
     margin: 40px 0 20px 0; 
 }
 .search-box {
-    flex: 1; 
-    margin-right: 50px;
-    height: 2.5rem; 
-    background-color: white; 
-    border: 1px solid #ddd; 
-    border-radius: 5px; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
-    display: flex; 
+    width: 90%;
+	background-color: white;
+	border-radius: 5px;
+	position: relative;
+	color: black;
+	box-shadow: 0 1px 5px 3px rgba(0, 0, 0, 0.12);
+}
+.busqueda{
+    flex: 1;
+    max-width: 800px;
+	margin: 150px auto;
+}
+.search-box ul li{
+    list-style: none;
+    width: 100%;
+    padding: 5px;
+    cursor: pointer;
 }
 #serie-container{
     display: flex;
@@ -57,15 +66,55 @@ h1 {
 .serie:last-child {
     border-bottom: none; 
 }
-input[type="text"] {
-    width: 100%; 
-    padding: 8px; 
-    border: 1px solid #ccc; 
-    border-radius: 4px; 
-    font-size: 16px; 
+#sugerencia{   
+    max-height: 280px;
+    opacity: 0;
+    pointer-events: none;
+    padding: 0;
+    overflow-y: auto;
+    
+}
+.search-box.active #sugerencia {
+	opacity: 1;
+	pointer-events: auto;
+	padding: 10px 8px;
+}
+
+.search-box.active #sugerencia li {
+	display: block;
+}
+
+#sugerencia li {
+	list-style: none;
+	width: 100%;
+	padding: 8px 12px;
+	border-radius: 5px;
+	display: none;
+}
+
+#sugerencia li:hover{
+    background-color: #414b57;
+    color: white;
+}
+.search-box input {
+	width: 90%;
+	border: none;
+	outline: none;
+	border-radius: 5px;
+	height: 47px;
+	padding: 0 20px 0 20px;
+	font-size: 18px;
+}
+.boton{
+    position: absolute;
+	top: 0;
+	right: -4%;
+	font-size: 22px;
+	cursor: pointer;
+	color: white;
 }
 button {
-    padding: 8px 16px; 
+    padding: 10px 16px; 
     border: none; 
     background-color: #2f3f49; 
     color: white; 

@@ -9,23 +9,26 @@ const dialog = document.getElementById('dialog');
 const dialogEliminar = document.getElementById('dialog-eliminar');
 const dialogañadir = document.getElementById("anadir")
 const overlay = document.getElementById('overlay');
-const cerrarDialogo = document.getElementById('cerrar-dialogo');
+const cerarDialogo = document.getElementById('cerrar-dialogo');
 const confirmarEliminar = document.getElementById('confirmar-eliminar');
-const anadir = document.getElementById('agregar-datos');
+const anadir = document.getElementById('agregar-datos'); 
+const sugEL = document.getElementById('sugerencia')
 
-let id 
+addEventListener("DOMContentLoaded",async ()=>{
+    await cargarSeries()
+    mostrarDetallesSerie(datosSerie.filter(titulo => titulo.titulo))
+})
 
 class Serie {
     constructor(lista) {
-        this.id = ++id;  
         this.titulo = lista.elements["titulo"].value;
-        this.foto = lista.elements["foto"].value;
         this.creador = lista.elements["creador"].value;
         this.cantidad_de_temporadas = lista.elements["cantidad_de_temporadas"].value;
-        this.personajes_principales = lista.elements["personajes_principales"].value.split(",");
+        this.personajes_principales = lista.elements["personajes_principales"].value;
         this.valoracion = lista.elements["valoracion"].value;
         this.ano_de_transmision = lista.elements["ano_de_transmision"].value;
         this.ano_de_finalizacion = lista.elements["ano_de_finalizacion"].value;
+        this.foto = lista.elements["foto"].value;
     }
 }
 function cargarDatosEnFormulario(serie) {
@@ -70,7 +73,6 @@ async function actualizarDetalleSerie(id, datosActualizados) {
       }
   
       const elementoActualizado = await respuesta.json();
-      console.log("Elemento actualizado:", elementoActualizado);
       return elementoActualizado; 
   
     } catch (error) {
@@ -81,6 +83,7 @@ async function actualizarDetalleSerie(id, datosActualizados) {
 
 async function aggDetalleSerie(serie) {
     try {
+        console.log(serie)
         const respuesta = await fetch(`${apiUrl}/personajes/`, {
             method: 'POST',
             headers: {
@@ -93,7 +96,6 @@ async function aggDetalleSerie(serie) {
         }
         await cargarSeries()
         const serieAgregada = await respuesta.json();
-        console.log('Serie agregada:', serieAgregada);
     } catch (error) {
         console.error("Error al agregar la serie:", error);
     }
@@ -109,7 +111,7 @@ async function eliminarElementoAPI(id) {
             throw new Error(`Error al eliminar el elemento: ${respuesta.status}`);
             }
             await cargarSeries()
-            console.log(`Elemento con ID ${id} eliminado correctamente.`);
+            
             
             return true;
     } catch (error) {
@@ -124,8 +126,8 @@ async function cargarSeries() {
         const respuesta = await fetch(`${apiUrl}/personajes/`);
         console.log(respuesta)
         const series = await respuesta.json();
+        
         datosSerie = series
-        id = datosSerie[datosSerie.length-1].id
 
     } catch (error) {
         console.error("Error al cargar las series:", error);
@@ -168,7 +170,7 @@ async function mostrarDetallesSerie(titulo) {
     try {
         const respuesta = await fetch(`${apiUrl}/personajes/${titulo[0].id}`);
         const serie = await respuesta.json();
-
+        console.log(serie)
         detalleEL.innerHTML = `
             <h1>${serie.titulo}</h1>
             <div class="container-second">
@@ -178,7 +180,7 @@ async function mostrarDetallesSerie(titulo) {
                 <div class="decribcion">
                     <p><strong>Creador:</strong> ${serie.creador}</p>
                     <p><strong>Temporadas:</strong> ${serie.cantidad_de_temporadas}</p>
-                    <p><strong>Personajes Principales:</strong> ${serie.personajes_principales.join(", ")}</p>
+                    <p><strong>Personajes Principales:</strong> ${serie.personajes_principales}</p>
                     <p><strong>Valoración:</strong> ${serie.valoracion}</p>
                     <p><strong>Año de Transmisión:</strong> ${serie.ano_de_transmision}</p>
                     <p><strong>Año de Finalización:</strong> ${serie.ano_de_finalizacion}</p>
@@ -194,7 +196,6 @@ async function mostrarDetallesSerie(titulo) {
         });
         confirmarEliminar.addEventListener("click", () => {
             const id = eliminar.dataset.id;
-            console.log(id)
             eliminarElementoAPI(id);
         });
         editar.addEventListener('click', () => {
@@ -225,13 +226,17 @@ botonEL.addEventListener("click",()=>{
 botonAggEL.addEventListener("click", (e) => {
     const formulario = document.getElementById("formulario-editar");
     const serie = new Serie(formulario);
-    console.log("hola")
+   
+    
     if (e.currentTarget.dataset.id == 0) {
         aggDetalleSerie(serie);
+        alert("Se agrego correctamente");
     }else{
         actualizarSerie(e.currentTarget.dataset.id, serie);
+        alert("Se actualizo correctamente");
     }
-    
+    dialog.style.display = 'none';
+    overlay.style.display = 'none';
 });
 
 
@@ -253,12 +258,12 @@ dialogañadir.addEventListener('click', () => {
     overlay.style.display = 'block';
 });
 
-
+/*
 cerrarDialogo.addEventListener('click', () => {
 
     dialog.style.display = 'none';
     overlay.style.display = 'none';
-});
+});*/
 
 document.getElementById('cancelar-eliminar').addEventListener('click', () => {
     dialogEliminar.style.display = 'none';
@@ -276,5 +281,20 @@ overlay.addEventListener('click', () => {
     dialogEliminar.style.display = 'none';
     overlay.style.display = 'none';
 });
-
-window.onload = cargarSeries
+buscarEl.addEventListener("keyup",()=>{
+    const text = buscarEl.value
+    const peliculasFiltradas=datosSerie.filter(titulo=>titulo.titulo.toLowerCase().includes(text))
+    let serie = ""
+    peliculasFiltradas.forEach(element => {
+        serie += 
+        `
+        <li onclick="agg(this)"><strong>${element.titulo}</strong></li>
+        `
+    });
+    document.querySelector('.search-box').classList.add('active');
+    sugEL.innerHTML=serie
+})
+function agg(element) {
+    let selectUserData = element.textContent;
+	buscarEl.value = selectUserData;
+}
